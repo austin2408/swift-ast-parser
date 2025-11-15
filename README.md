@@ -13,26 +13,11 @@ git clone https://github.com/austin2408/swift-ast-parser.git
 cd swift-ast-parser
 swift build -c release
 ```
-
-The compiled binary will be at `.build/release/swift-ast-parser`.
-
 ### Install Locally
 
 ```bash
-swift build -c release --static-swift-stdlib
 cp .build/release/swift-ast-parser /usr/local/bin/
 ```
-
-### Build Standalone Executable
-
-To build a standalone executable with statically linked Swift libraries (recommended for distribution):
-
-```bash
-swift build -c release --static-swift-stdlib
-```
-
-The standalone binary will be at `.build/release/swift-ast-parser` and can be distributed without Swift runtime dependencies.
-
 ## Usage
 
 ### Basic Usage
@@ -156,7 +141,7 @@ Currently supported common Swift symbol types:
 
 ## Requirements
 
-- Swift 5.9+
+- Swift 5.9 or later
 
 ### Changing Swift Version
 

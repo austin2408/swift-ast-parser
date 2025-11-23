@@ -241,7 +241,6 @@ The `--show-type` flag enables automatic type detection for variables. The parse
 swift-ast-parser MyViewController.swift --show-type
 
 # Combine with other flags
-swift-ast-parser Sources/ --recursive --show-type
 swift-ast-parser MyFile.swift --deep --show-type
 ```
 

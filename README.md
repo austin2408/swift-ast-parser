@@ -53,6 +53,21 @@ swift-ast-parser . --recursive
 swift-ast-parser Sources/ --recursive --deep
 ```
 
+### Type Detection
+
+Include type information for variables using the `--show-type` flag:
+
+```bash
+swift-ast-parser MyFile.swift --show-type
+```
+
+This detects variable types from:
+- Explicit type annotations: `let foo: UICollectionView`
+- Constructor calls: `let foo = UICollectionView()`
+- Custom classes: `let foo = CustomCollectionView()`
+- Literals: `let x = 42` (Int), `let y = 1.5` (Double), `let s = "hello"` (String)
+- Property access: `let color = UIColor.red`
+
 ### Help
 
 ```bash
@@ -86,6 +101,47 @@ When processing a single file, the output is an array of symbols:
         "startLine": 13,
         "endLine": 20,
         "members": []
+      }
+    ]
+  }
+]
+```
+
+### With Type Detection
+
+When using the `--show-type` flag, variable declarations include type information:
+
+```json
+[
+  {
+    "kind": "class",
+    "name": "ViewController",
+    "startLine": 3,
+    "endLine": 20,
+    "members": [
+      {
+        "kind": "var",
+        "name": "collectionView",
+        "startLine": 5,
+        "endLine": 5,
+        "members": [],
+        "type": "UICollectionView"
+      },
+      {
+        "kind": "var",
+        "name": "count",
+        "startLine": 6,
+        "endLine": 6,
+        "members": [],
+        "type": "Int"
+      },
+      {
+        "kind": "var",
+        "name": "title",
+        "startLine": 7,
+        "endLine": 7,
+        "members": [],
+        "type": "String"
       }
     ]
   }
@@ -135,9 +191,59 @@ Currently supported common Swift symbol types:
 - `protocol` - Protocol declarations
 - `extension` - Extension declarations
 - `func` - Function declarations
-- `var` - Variable/property declarations
+- `var` - Variable/property declarations (includes optional `type` field with `--show-type`)
 - `init` - Initializer declarations
 - `deinit` - Deinitializer declarations
+
+## Type Detection
+
+The `--show-type` flag enables automatic type detection for variables. The parser analyzes the Swift syntax to determine types in multiple ways:
+
+### Detection Methods
+
+1. **Explicit Type Annotations**
+   ```swift
+   let collectionView: UICollectionView
+   ```
+   Detected type: `UICollectionView`
+
+2. **Constructor Calls**
+   ```swift
+   let tableView = UITableView()
+   let number = UInt64(100)
+   ```
+   Detected types: `UITableView`, `UInt64`
+
+3. **Custom Classes**
+   ```swift
+   class CustomView: UIView { }
+   let view = CustomView()
+   ```
+   Detected type: `CustomView`
+
+4. **Literal Values**
+   - Integers: `let x = 42` → `Int`
+   - Floating-point: `let y = 1.5` → `Double`
+   - Strings: `let s = "hello"` → `String`
+   - Booleans: `let b = true` → `Bool`
+   - Arrays: `let arr = [1, 2, 3]` → `Array`
+
+5. **Property Access**
+   ```swift
+   let color = UIColor.red
+   ```
+   Detected type: `UIColor`
+
+### Example Usage
+
+```bash
+# Parse with type detection
+swift-ast-parser MyViewController.swift --show-type
+
+# Combine with other flags
+swift-ast-parser Sources/ --recursive --show-type
+swift-ast-parser MyFile.swift --deep --show-type
+```
 
 ## Requirements
 

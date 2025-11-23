@@ -27,4 +27,17 @@ struct SymbolInfo: Codable {
     
     /// Nested symbols contained within this symbol (e.g., methods in a class)
     var members: [SymbolInfo] = []
+    
+    /// The detected type for variables (e.g., "UICollectionView", "UInt64", "Double")
+    /// This is populated when show_type flag is enabled
+    let type: String?
+    
+    init(kind: String, name: String, startLine: Int, endLine: Int, members: [SymbolInfo] = [], type: String? = nil) {
+        self.kind = kind
+        self.name = name
+        self.startLine = startLine
+        self.endLine = endLine
+        self.members = members
+        self.type = type
+    }
 }

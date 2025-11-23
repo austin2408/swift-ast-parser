@@ -18,6 +18,7 @@ func printUsage() {
     
     Options:
       --deep        Enable detection of nested functions and symbols
+      --show-type   Include type information for variables (e.g., UICollectionView, Int, Double)
       --recursive   Process directories recursively
       --version     Show version information
       --help        Show this help message
@@ -25,8 +26,9 @@ func printUsage() {
     Examples:
       swift-ast-parser MyFile.swift
       swift-ast-parser MyFile.swift --deep
+      swift-ast-parser MyFile.swift --show-type
       swift-ast-parser Sources/ --recursive
-      swift-ast-parser . --recursive --deep
+      swift-ast-parser . --recursive --deep --show-type
     """)
 }
 
@@ -40,7 +42,7 @@ struct FileResult: Codable {
     let symbols: [SymbolInfo]
 }
 
-func parseSwiftFile(at url: URL, deepScan: Bool) -> [SymbolInfo]? {
+func parseSwiftFile(at url: URL, deepScan: Bool, showType: Bool) -> [SymbolInfo]? {
     // Read and parse file
     guard let source = try? String(contentsOf: url, encoding: .utf8) else {
         fputs("Warning: Failed to read file: \(url.path)\n", stderr)
@@ -52,7 +54,7 @@ func parseSwiftFile(at url: URL, deepScan: Bool) -> [SymbolInfo]? {
     let converter = SourceLocationConverter(fileName: url.path, tree: sourceFile)
     
     // Collect symbols
-    let collector = SwiftASTCollector(sourceFile: sourceFile, locationConverter: converter, deepScan: deepScan)
+    let collector = SwiftASTCollector(sourceFile: sourceFile, locationConverter: converter, deepScan: deepScan, showType: showType)
     return collector.topLevelSymbols
 }
 
@@ -114,6 +116,7 @@ guard let path = path else {
 }
 
 let deepScan = arguments.contains("--deep")
+let showType = arguments.contains("--show-type")
 let recursive = arguments.contains("--recursive")
 
 // Find Swift files
@@ -126,7 +129,7 @@ guard !swiftFiles.isEmpty else {
 // Parse all files
 var results: [FileResult] = []
 for fileURL in swiftFiles {
-    if let symbols = parseSwiftFile(at: fileURL, deepScan: deepScan) {
+    if let symbols = parseSwiftFile(at: fileURL, deepScan: deepScan, showType: showType) {
         results.append(FileResult(file: fileURL.path, symbols: symbols))
     }
 }

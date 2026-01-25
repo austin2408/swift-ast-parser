@@ -100,10 +100,10 @@ class SwiftASTCollector: SyntaxVisitor {
     override func visit(_ node: FunctionDeclSyntax) -> SyntaxVisitorContinueKind {
         if deepScan {
             insideFunctionDepth += 1
-            enterContainer(node, kind: "func", name: node.name.text)
+            enterContainer(node, kind: "func", name: functionSignature(node))
             return .visitChildren
         } else {
-            handleLeaf(node, kind: "func", name: node.name.text)
+            handleLeaf(node, kind: "func", name: functionSignature(node))
             return .skipChildren
         }
     }
@@ -198,6 +198,34 @@ class SwiftASTCollector: SyntaxVisitor {
             stack[stack.count - 1] = parent
         } else {
             topLevelSymbols.append(symbol)
+        }
+    }
+    
+    /// Constructs the full function signature including name, parameters, and return type
+    private func functionSignature(_ node: FunctionDeclSyntax) -> String {
+        let baseName = node.name.text
+        let parameters = node.signature.parameterClause.parameters
+        
+        let paramStrings = parameters.map { param in
+            let firstName = param.firstName.text
+            let secondName = param.secondName?.text ?? ""
+            let typeDesc = param.type.description.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            if secondName.isEmpty {
+                return "\(firstName): \(typeDesc)"
+            } else {
+                return "\(firstName) \(secondName): \(typeDesc)"
+            }
+        }
+        
+        let paramClause = paramStrings.joined(separator: ", ")
+        let signature = "\(baseName)(\(paramClause))"
+        
+        if let returnClause = node.signature.returnClause {
+            let returnType = returnClause.type.description.trimmingCharacters(in: .whitespacesAndNewlines)
+            return "\(signature) -> \(returnType)".trimmingCharacters(in: .whitespaces)
+        } else {
+            return signature.trimmingCharacters(in: .whitespaces)
         }
     }
     

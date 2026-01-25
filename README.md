@@ -1,6 +1,6 @@
 # swift-ast-parser
 
-A fast and lightweight command-line tool for parsing Swift source code and extracting Abstract Syntax Tree (AST) information. Built on [SwiftSyntax](https://github.com/swiftlang/swift-syntax), it outputs structured JSON data about classes, structs, functions, and other Swift symbols.
+A fast and lightweight command-line tool for parsing Swift source code and extracting Abstract Syntax Tree (AST) information. Built on [SwiftSyntax](https://github.com/swiftlang/swift-syntax), it outputs structured JSON data about classes, structs, functions (with full signatures), and other Swift symbols.
 
 Perfect for CI/CD pipelines, code analysis tools, documentation generators, and automated code review systems.
 
@@ -97,9 +97,16 @@ When processing a single file, the output is an array of symbols:
       },
       {
         "kind": "func",
-        "name": "myMethod",
+        "name": "myMethod(name: String, count: Int) -> Bool",
         "startLine": 13,
         "endLine": 20,
+        "members": []
+      },
+      {
+        "kind": "func",
+        "name": "calculateSum(_ numbers: [Int]) -> Int",
+        "startLine": 22,
+        "endLine": 25,
         "members": []
       }
     ]
@@ -162,7 +169,15 @@ When processing multiple files (directory or recursive), the output includes fil
         "name": "MyClass",
         "startLine": 10,
         "endLine": 50,
-        "members": []
+        "members": [
+          {
+            "kind": "func",
+            "name": "processData(data: Data) -> Result<String, Error>",
+            "startLine": 12,
+            "endLine": 25,
+            "members": []
+          }
+        ]
       }
     ]
   },
@@ -174,7 +189,15 @@ When processing multiple files (directory or recursive), the output includes fil
         "name": "MyStruct",
         "startLine": 5,
         "endLine": 20,
-        "members": []
+        "members": [
+          {
+            "kind": "func",
+            "name": "validate() -> Bool",
+            "startLine": 7,
+            "endLine": 12,
+            "members": []
+          }
+        ]
       }
     ]
   }
@@ -190,7 +213,7 @@ Currently supported common Swift symbol types:
 - `enum` - Enum declarations
 - `protocol` - Protocol declarations
 - `extension` - Extension declarations
-- `func` - Function declarations
+- `func` - Function declarations (includes full signature with parameters and return type)
 - `var` - Variable/property declarations (includes optional `type` field with `--show-type`)
 - `init` - Initializer declarations
 - `deinit` - Deinitializer declarations
